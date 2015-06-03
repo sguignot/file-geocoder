@@ -154,6 +154,7 @@ db.find({GeocodeStatus: {$exists: false}}, function (err, docs) {
 					var locality = '';
 					var administrative_area_level_1 = '';
 					var country = '';
+					var ac;
 
 					try {
 
@@ -175,22 +176,29 @@ db.find({GeocodeStatus: {$exists: false}}, function (err, docs) {
 								.value()[0];
 
 							// find the administrative_area_level_1
-							administrative_area_level_1 = _(results.address_components)
+							ac = _(results.address_components)
 								.filter(function (v) {
 									return _.contains(v.types, 'administrative_area_level_1');
 								})
-								.first(1)
-								.pluck('long_name')
-								.value()[0];
+								.first(1);
+							if (ac) {
+								administrative_area_level_1 = ac
+									.pluck('long_name')
+									.value()[0];
+							}
 
 							// find the country
-							country = _(results.address_components)
+							ac = _(results.address_components)
 								.filter(function (v) {
 									return _.contains(v.types, 'country');
 								})
 								.first(1)
-								.pluck('long_name')
-								.value()[0];
+							if (ac) {
+								country = ac
+									.pluck('long_name')
+									.value()[0];
+							}
+
 						}
 					} catch (e) {
 						console.log(JSON.stringify(data, null, 4));
